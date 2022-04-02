@@ -1,0 +1,36 @@
+
+import static org.junit.Assert.assertSame;
+
+import hydraulic.*;
+
+public class MyTest {
+
+	public static void main(String[] args) {
+		
+		HSystem s = new HSystem();
+		
+		Source src = new Source("Src");
+		s.addElement(src);
+		Tap r = new Tap("R");
+		s.addElement(r);
+		Split t = new Split("T");
+		s.addElement(t);
+		Sink sink1 = new Sink("sink A");
+		s.addElement(sink1);
+		Sink sink2 = new Sink("sink B");
+		s.addElement(sink2);
+		
+		sink1.connect(r);
+		
+		src.connect(r);
+		r.connect(t);
+		t.connect(sink1,0);
+		t.connect(sink2,1);
+		
+		System.out.println(src.getOutput());
+		System.out.println(r.getOutput().getName());
+		Element e[]=t.getOutputs();
+		
+	}
+
+}

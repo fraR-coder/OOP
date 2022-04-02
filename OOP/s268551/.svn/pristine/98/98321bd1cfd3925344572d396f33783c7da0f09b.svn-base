@@ -1,0 +1,48 @@
+
+public class Main {
+
+	public static void main(String[] args) {
+		p1 a;
+		Nemico n;
+		
+		a=new p1();
+		n=new Nemico();
+		
+		a.aggiorna("fra","lampo","lancia","tuono",10,50,100);
+		n.aggiorna_nemico("acqua",30);
+		combatti(a,n);
+
+	}
+	static void combatti(p1 a, Nemico n) {
+		while(a.vivo && n.vivo) {
+			a.stat(a);
+			n.stat(n);
+			pcolpito(a,n);
+			if(!a.vivo) {
+				System.out.println("Personaggio "+ a.nome+ " morto");
+				break;
+			}
+			ncolpito(a,n);
+			if(!n.vivo) {
+				System.out.println("nemico morto");
+				break;
+			}
+			
+			
+		}
+	}
+
+	static void pcolpito(p1 a,Nemico n) {
+		a.pv=a.pv-n.forza;
+		if(a.pv<=0 ) {
+			a.vivo=false;
+		}
+	}
+	
+	static void ncolpito(p1 a,Nemico n) {
+		n.forza=n.forza- a.potenza;
+		if(n.forza<=0 ) {
+			n.vivo=false;
+		}
+	}
+}

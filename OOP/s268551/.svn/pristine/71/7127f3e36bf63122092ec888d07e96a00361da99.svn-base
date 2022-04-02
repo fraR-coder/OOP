@@ -1,0 +1,29 @@
+package World;
+public class Nemico extends Personaggio {
+	
+	String covo;
+
+	
+	
+	
+	
+	
+
+
+
+	public Nemico(String nome, Tipo tipo, String arma, int forza, String covo) {
+		super(nome, tipo, arma, forza);
+		this.covo = covo;
+	}
+
+
+
+
+
+
+
+
+
+	
+	
+}

@@ -1,0 +1,9 @@
+package rentacar;
+
+public class Vehicle {
+	
+	public enum VehicleStatus {
+		AVAILABLE,
+		TAKEN
+	}
+}

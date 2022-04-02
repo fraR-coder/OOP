@@ -1,0 +1,4 @@
+package rentacar;
+
+public class Car extends Vehicle{
+}

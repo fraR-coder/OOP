@@ -1,0 +1,49 @@
+package hydraulic;
+
+/**
+ * Represents a split element, a.k.a. T element
+ * 
+ * During the simulation each downstream element will
+ * receive a stream that is half the input stream of the split.
+ */
+
+public class Split extends Element {
+	
+	private Element output1;
+	
+	/**
+	 * Constructor
+	 * @param name
+	 */
+	public Split(String name) {
+		super(name);
+		//TODO: complete
+	}
+    
+	/**
+	 * returns the downstream elements
+	 * @return array containing the two downstream element
+	 */
+    public Element[] getOutputs(){
+    		//TODO: complete
+    	Element e[]= {super.getOutput(),this.output1};
+        return e;
+    }
+
+    /**
+     * connect one of the outputs of this split to a
+     * downstream component.
+     * 
+     * @param elem  the element to be connected downstream
+     * @param noutput the output number to be used to connect the element
+     */
+    
+	public void connect(Element elem, int noutput){
+		//TODO: complete
+		if(noutput==0) super.connect(elem);
+		if(noutput==1) this.output1=elem;
+		
+		
+		
+	}
+}

@@ -1,0 +1,216 @@
+/*--------------*-----------------------------------------------------------*\
+*|   ######     | CLASS SAMPLE FOR "OBJECT ORIENTED PROGRAMMING" (04JEY)     *
+*|  #######     | (c) Jun 2021, Giovanni Squillero <squillero@polito.it>     *
+*|  ####   \    | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+*|   ##G   c\   | Copying and distributing this file for classroom use,      *
+*|   ##     _\  | either with or without modification, are permitted without *
+*|   |    _/    | royalties provided that this 9-line comment is preserved.  *
+*|   |   _/     | ===> THIS FILE IS OFFERED AS-IS, WITHOUT ANY WARRANTY <=== *
+\*--------------*-----------------------------------------------------------*/
+
+package delivery;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
+
+public class Delivery {
+
+	class Pair<T> {
+		T first;
+		T second;
+
+		Pair(T first, T second) {
+			this.first = first;
+			this.second = second;
+		}
+
+		T getFirst() {
+			return first;
+		}
+
+		T getSecond() {
+			return second;
+		}
+
+		@Override
+		public String toString() {
+			return "<" + first.toString() + ", " + second.toString() + ">";
+		}
+	}
+
+	private Set<String> restaurantCategories = new HashSet<>();
+	private Map<String, List<Restaurant>> restaurantsByCategory = new HashMap<>();
+	private Map<String, Restaurant> restaurantDirectory = new HashMap<>();
+	private List<Order> orders = new ArrayList<>();
+	private Map<String, Dish> dishes = new HashMap<>();
+	private Map<Restaurant, List<Integer>> ratings = new HashMap<>();
+
+	
+	public Delivery() {
+		Order fakeOrder = new Order(null, null, 0, 0);
+		fakeOrder.assignOrder();
+		orders.add(fakeOrder);
+	}
+
+	// R1
+
+	public void addCategory(String category) throws DeliveryException {
+		if (restaurantCategories.add(category) == false)
+			throw new DeliveryException("Duplicated category");
+	}
+
+	public ArrayList<String> getCategories() {
+		return new ArrayList<>(restaurantCategories);
+	}
+
+	public void addRestaurant(String name, String category) throws DeliveryException {
+		if (!restaurantCategories.contains(category))
+			throw new DeliveryException("Undefined category");
+		if (!restaurantsByCategory.containsKey(category))
+			restaurantsByCategory.put(category, new ArrayList<>());
+		Restaurant restaurant = new Restaurant(name);
+		restaurantDirectory.put(name, restaurant);
+		restaurantsByCategory.get(category).add(restaurant);
+	}
+
+	private List<String> getRestaurantsForCategory_stream(String category) {
+		if (restaurantsByCategory.containsKey(category))
+			return restaurantsByCategory.get(category).stream().map(Restaurant::getName).sorted().collect(Collectors.toList());
+		else
+			return new ArrayList<>();
+	}
+
+	private List<String> getRestaurantsForCategory_nostream(String category) {
+		List<String> result = new ArrayList<>();
+		if (restaurantsByCategory.containsKey(category)) {
+			for (Restaurant r : restaurantsByCategory.get(category))
+				result.add(r.getName());
+			Collections.sort(result);
+		}
+		return result;
+	}
+
+	public List<String> getRestaurantsForCategory(String category) {
+		return getRestaurantsForCategory_nostream(category);
+	}
+
+	// R2
+
+	public void addDish(String name, String restaurantName, float price) throws DeliveryException {
+		Dish dish;
+		if(!dishes.containsKey(name))
+			dishes.put(name, new Dish(name));
+		restaurantDirectory.get(restaurantName).addDish(dishes.get(name), price);
+	}
+
+	public Map<String, List<String>> getDishesByPrice(float minPrice, float maxPrice) {
+		return restaurantDirectory.values().stream()
+				.flatMap(r -> r.getDishePrices().keySet().stream()
+						.filter(d -> r.getDishPrice(d) >= minPrice && r.getDishPrice(d) <= maxPrice)
+						.map(d -> new Pair<String>(r.getName(), d.getName())))
+				.collect(Collectors.groupingBy(Pair::getFirst, TreeMap::new,
+						Collectors.mapping(Pair::getSecond, Collectors.toList())));
+	}
+
+	public List<String> getDishesForRestaurant(String restaurantName) {
+		if (restaurantDirectory.containsKey(restaurantName))
+			return restaurantDirectory.get(restaurantName).getDishePrices().keySet().stream().map(Dish::getName)
+					.collect(Collectors.toList());
+		else
+			return new ArrayList<>();
+	}
+
+	public List<String> getDishesByCategory(String category) {
+		if (restaurantsByCategory.containsKey(category))
+			return restaurantsByCategory.get(category).stream().flatMap(r -> r.getDishePrices().keySet().stream()).map(Dish::getName)
+					.distinct().collect(Collectors.toList());
+		else
+			return new ArrayList<>();
+	}
+
+	// R3
+
+	public int addOrder(String dishNames[], int quantities[], String customerName, String restaurantName,
+			int deliveryTime, int deliveryDistance) {
+		Restaurant restaurant = restaurantDirectory.get(restaurantName);
+		Order order = new Order(customerName, restaurantDirectory.get(restaurantName), deliveryTime,
+				deliveryDistance);
+		for(int t = 0; t < dishNames.length; ++t) {
+			order.addDish(dishes.get(dishNames[t]), quantities[t]);
+		}
+		orders.add(order);
+		return orders.size() - 1;
+	}
+
+	/**
+	 * The method scheduleDelivery(int deliveryTime, int maxDistance, int maxOrders)
+	 * enables to schedule the deliveries. Delivero has several bellboys, some using
+	 * bicycle, others motorbikes. To optimize the delivery based on the
+	 * transportation this method returns the order numbers of the first maxOrders
+	 * (following the orders arrival time) scheduled to be delivered at deliveryTime
+	 * whose deliveryDistance is lower or equal that maxDistance. Once returned by
+	 * the method the orders must be marked as assigned so that they will not be
+	 * considered if the method is called again. The method returns an empty list if
+	 * there are no orders (not yet assigned) that meet the requirements.
+	 **/
+	public List<Integer> scheduleDelivery(int deliveryTime, int maxDistance, int maxOrders) {
+		List<Integer> deliveries = new ArrayList<>();
+		for(int o  = 1; o < orders.size(); ++o) {
+			Order order = orders.get(o);
+			if(deliveries.size() < maxOrders && order.isNotAssigned() && order.getDeliveryTime() == deliveryTime && order.getDeliveryDistance() <= maxDistance) {
+				order.assignOrder();	
+				deliveries.add(o);
+			}
+		}
+		
+		System.out.println(deliveries);
+		return deliveries;
+	}
+
+	public int getPendingOrders() {
+		return (int)orders.stream().filter(Order::isNotAssigned).count();
+	}
+
+	// R4
+	public void setRatingForRestaurant(String restaurantName, int rating) {
+		Restaurant restaurant = restaurantDirectory.get(restaurantName); 
+		if(!ratings.containsKey(restaurant))
+			ratings.put(restaurant, new ArrayList<>());
+		ratings.get(restaurant).add(rating);
+	}
+
+	/**
+	 * returns the ordered list of restaurant.
+	 * 
+	 * The restaurant must be ordered by decreasing average rating. The average
+	 * rating of a restaurant is the sum of all rating divided by the number of
+	 * ratings.
+	 * 
+	 * @return ordered list of restaurants
+	 */
+	public List<String> restaurantsAverageRating() {
+		Map<Restaurant, Double> avgRatings = new HashMap<>();
+		for(Restaurant r: restaurantDirectory.values()) {
+			avgRatings.put(r, ratings.get(r).stream().collect(Collectors.averagingInt(e->e)));
+		}
+		System.out.println(avgRatings);
+		System.exit(42);
+		return null;
+	}
+
+	// R5
+	public Map<String, Long> ordersPerCategory() {
+		return null;
+	}
+
+	public String bestRestaurant() {
+		return "";
+	}
+}

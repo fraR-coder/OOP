@@ -1,0 +1,88 @@
+package hydraulic;
+
+/**
+ * Represents the generic abstract element of an hydraulics system.
+ * It is the base class for all elements.
+ *
+ * Any element can be connect to a downstream element
+ * using the method {@link #connect(Element) connect()}.
+ */
+public abstract class Element {
+	
+	private final static int MAX_OUT=2;
+	protected String name;
+	protected Element imput;
+	protected Element[] outputs=new Element[MAX_OUT];
+	
+	protected double inflow,outflow;
+	
+	public double getInflow() {
+		return inflow;
+	}
+
+	public void setInflow(double inflow) {
+		this.inflow = inflow;
+	}
+
+	public double getOutflow() {
+		return outflow;
+	}
+
+	public void setOutflow(double outflow) {
+		this.outflow = outflow;
+	}
+
+	/**
+	 * Constructor
+	 * @param name the name of the element
+	 */
+	
+	public Element(String name){
+		// TODO: to be implemented
+		this.name=name;
+		
+	}
+
+	/**
+	 * getter method
+	 * @return the name of the element
+	 */
+	public String getName(){
+		// TODO: to be implemented
+		return this.name;
+	}
+	
+	/**
+	 * Connects this element to a given element.
+	 * The given element will be connected downstream of this element
+	 * @param elem the element that will be placed downstream
+	 */
+	public void connect(Element elem){
+		// TODO: to be implemented
+		this.outputs[0]=elem;
+		elem.setImput(this);
+		
+		
+	}
+	
+	/**
+	 * Retrieves the element connected downstream of this
+	 * @return downstream element
+	 */
+	public Element getOutput(){
+		// TODO: to be implemented
+		return this.outputs[0];
+	}
+	
+	public void setImput(Element e) {
+		
+		this.imput=e;
+	}
+	
+	
+	public abstract void simulate(SimulationObserver observer,double flow);
+		
+		
+	
+	
+}

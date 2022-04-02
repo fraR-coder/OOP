@@ -1,0 +1,45 @@
+/*--------------*-----------------------------------------------------------*\
+*|   ######     | CLASS SAMPLE FOR "OBJECT ORIENTED PROGRAMMING" (04JEY)     *
+*|  #######     | (c) Jun 2021, Giovanni Squillero <squillero@polito.it>     *
+*|  ####   \    | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+*|   ##G   c\   | Copying and distributing this file for classroom use,      *
+*|   ##     _\  | either with or without modification, are permitted without *
+*|   |    _/    | royalties provided that this 9-line comment is preserved.  *
+*|   |   _/     | ===> THIS FILE IS OFFERED AS-IS, WITHOUT ANY WARRANTY <=== *
+\*--------------*-----------------------------------------------------------*/
+
+package delivery;
+
+public class Dish implements Comparable<Dish> {
+	private String name;
+
+	Dish(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public int hashCode() {
+		return name.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof Dish))
+			return false;
+		Dish other = (Dish) obj;
+		return name.equals(other.name);
+	}
+
+	@Override
+	public int compareTo(Dish other) {
+		return this.name.compareTo(other.name);
+	}
+
+	public String getName() {
+		return name;
+	}
+
+
+}

@@ -1,0 +1,115 @@
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+
+import it.polito.oop.vaccination.VaccineException;
+import it.polito.oop.vaccination.Vaccines;
+
+public class MyTest {
+	
+	public static void  main(String ...args) throws VaccineException, FileNotFoundException, IOException {
+		Vaccines vs=new Vaccines();
+		
+		vs.setAgeIntervals(30,40,50,60,70);
+
+    	vs.defineHub("Hub 1");
+    	vs.defineHub("Hub 2");
+    	vs.defineHub("Hub 3");
+		
+    	vs.setStaff("Hub 1", 7, 6, 4);
+    	vs.setStaff("Hub 2", 4, 3, 2);
+    	vs.setStaff("Hub 3", 3, 3, 2);
+    	
+    
+    	ArrayList<String> lines=new ArrayList<>();
+    	lines.add("SSN,LAST,FIRST,YEAR");
+    	lines.addAll(generatePersons(10));
+    	Files.write(Paths.get("people.csv"), lines);
+    	
+    	vs.loadPeople(new FileReader("people.csv"));
+    	vs.setHours(8,8,8,8,8,6,4);
+    	
+    	List<String> alloc = vs.allocate("Hub 1", 1);
+    	vs.clearAllocation();
+
+    	
+    	List<Map<String,List<String>>> wp = vs.weekAllocate();
+    	Map<String,Double> allInAge = vs.propAllocatedAge();
+		
+	}
+	
+	 private interface PersonListener {
+	    	boolean handlePerson(String first, String last, String ssn, int year);
+	    }
+
+	    /**
+	     * Generates fake people information 
+	     * 
+	     * Returns a set with the people information
+	     * 
+	     * @param n			number of people to generate
+	     * @return			the set of person descriptions
+	     */
+	    private static Set<String> generatePersons( int n) {
+	    	return generateAndAddPerson(n,null);
+	    }
+
+
+	    static String[] firsts = {"Ali","Anna","Enrica","Giorgio","Luca","Lucia","Mario","Miriam","Paola","Xavier"};
+	    static String[] lasts = {"Abaco","Draghi","Letto","Melone","Mattei","Russo","Neri","Rossi","Verdi","Xavier"};
+	    static String[] places = {"L219","A213","F789","G456","H501","Z403","R129"};
+	    
+	    private static String pick(String [] options, Random r) {
+	    	return options[r.nextInt(options.length)];
+	    }
+	    private static Random rg = new Random(1971);
+	    
+	    /**
+	     * Take a name (first or last) and emulates 
+	     * how they are encoded in real Italian "codice fiscale"
+	     * 
+	     * @param name
+	     * @return
+	     */
+	    private static String toCode(String name) {
+	    	name = name.toUpperCase();
+	    	String consonants = name.replaceAll("[AEIOU ]", "");
+	    	String vouels = name.replaceAll("[^AEIOU]", "");
+	    	return (consonants+vouels).substring(0,3);
+	    }
+	    
+	    final static int CURRENT_YEAR=java.time.LocalDate.now().getYear();
+	    
+	 private static Set<String> generateAndAddPerson( int n, PersonListener listener) {
+	    	HashSet<String> cfs = new HashSet<>();
+	    	HashSet<String> people = new HashSet<>();
+	    	while(cfs.size() < n) {
+		    	String first = pick(firsts,rg);
+		    	String last = pick(lasts,rg);
+		    	int year = 1922+rg.nextInt(2021-1921);
+		    	String place = pick(places,rg);
+		    	char cin1 = ((char) ('A'+rg.nextInt('Z'-'A')));
+		    	char cin2 = ((char) ('A'+rg.nextInt('Z'-'A')));
+		    	String ssn=toCode(last)+toCode(first)+(year%100)+place+cin1+cin2; // generate a fake ssn (codice fiscale)
+		    			  
+		    	String person = ssn + "," + last + "," + first + "," + year;
+		    	if(cfs.add(ssn)){ // skip possible duplicates
+		    		people.add(person);
+		    		if(listener!=null) listener.handlePerson(first, last, ssn, year);
+		    	}
+	    	}
+	    	return people;
+	    }
+
+
+
+	
+}

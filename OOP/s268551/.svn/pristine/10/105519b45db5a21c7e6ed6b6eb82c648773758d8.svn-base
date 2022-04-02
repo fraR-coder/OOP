@@ -1,0 +1,40 @@
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import it.polito.oop.vaccination.VaccineException;
+import it.polito.oop.vaccination.Vaccines;
+
+public class MyTest {
+	
+	public static void  main(String ...args) throws VaccineException, FileNotFoundException, IOException {
+		Vaccines vs=new Vaccines();
+		
+		vs.setAgeIntervals(30,40,50,60,70);
+
+    	vs.defineHub("Hub 1");
+    	vs.defineHub("Hub 2");
+    	vs.defineHub("Hub 3");
+		
+    	vs.setStaff("Hub 1", 7, 6, 4);
+    	vs.setStaff("Hub 2", 4, 3, 2);
+    	vs.setStaff("Hub 3", 3, 3, 2);
+    	
+    	final Map<Integer, String> errors = new HashMap<Integer, String>();
+        vs.setLoadListener((i, l) -> errors.put(i, l));
+    	final String incomplete = "SSN,LAST,FIRST,YEAR\nABCDEF01G23H456I,Smith,John,1923\nABCDEF01G23H456I,Smith,John,1923\nABCFED01G23H987J,Smith\n";
+        final StringReader sr = new StringReader(incomplete);
+    	vs.loadPeople(sr);
+    	vs.setHours(8,8,8,8,8,6,4);
+    	
+    	List<String> alloc = vs.allocate("Hub 1", 1);
+		
+	}
+	
+
+
+	
+}

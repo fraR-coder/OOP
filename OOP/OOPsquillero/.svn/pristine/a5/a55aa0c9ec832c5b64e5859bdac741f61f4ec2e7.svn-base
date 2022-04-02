@@ -1,0 +1,50 @@
+/*--------------*-----------------------------------------------------------*\
+*|   ######     | CLASS SAMPLE FOR "OBJECT ORIENTED PROGRAMMING" (04JEY)     *
+*|  #######     | (c) Apr 2021, Giovanni Squillero <squillero@polito.it>     *
+*|  ####   \    | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *
+*|   ##G   c\   | Copying and distributing this file for classroom use,      *
+*|   ##     _\  | either with or without modification, are permitted without *
+*|   |    _/    | royalties provided that this 9-line comment is preserved.  *
+*|   |   _/     | ===> THIS FILE IS OFFERED AS-IS, WITHOUT ANY WARRANTY <=== *
+\*--------------*-----------------------------------------------------------*/
+
+import it.polito.oop.movie.*;
+
+public class TestApp {
+
+	public static void main(String[] args) throws MovieException {
+		TestApp ta = new TestApp();
+		System.out.println("Adding Japanese Directors");
+		ta.addJapaneseDirectors();
+		System.out.println("Adding again Japanese Directors");
+		ta.addJapaneseDirectors();
+		System.out.println("Adding Italian Directors");
+		ta.addItalianDirectors();
+		System.out.println("Adding again Italian Directors");
+		ta.addItalianDirectors();
+	}
+	
+	void addItalianDirectors() throws MovieException {
+		Staff staff = Staff.getInstance();
+
+		staff.addDirector(new Director("Sergio Leone"));
+	}
+
+	void addJapaneseDirectors() {
+		Staff staff = Staff.getInstance();
+
+		try {
+			staff.addDirector(new Director("Yasujirō Ozu"));
+		} catch (MovieException me) {
+			System.err.println("Yeuch! " + me.getMessage());
+		}
+	}
+
+	void addAmericanDirectors() throws MovieException {
+		Staff staff = Staff.getInstance();
+
+		staff.addDirector(new Director("Stanley Kubrick"));
+		Staff.getInstance().addDirector(new Director("David Lynch"));
+	}
+
+}
